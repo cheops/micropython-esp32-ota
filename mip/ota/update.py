@@ -32,14 +32,20 @@ def open_url(url: str, username=None, password=None) -> io.BufferedReader:
         return open(url, "rb")
     else:
         import requests
+        
+        if "api.github.com" in url:
+            headers = {"User-Agent": "micropython", "Accept": "application/vnd.github.raw+json"}
+        else:
+            headers = {}
 
         if username and password:
-            r = requests.get(url, auth = (username, password))
+            r = requests.get(url, auth = (username, password), headers=headers)
         else:
-            r = requests.get(url)
+            r = requests.get(url, headers=headers)
 
         code: int = r.status_code
         if code != 200:
+            print(r.text)
             r.close()
             raise ValueError(f"HTTP Error: {code}")
         return SocketWrapper(r.raw)  # type: ignore
