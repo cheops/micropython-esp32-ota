@@ -63,14 +63,15 @@ def partition_table() -> list[tuple[int, int, int, int, str, bool]]:
 def partition_table_print() -> None:
     ptype = {Partition.TYPE_APP: "app", Partition.TYPE_DATA: "data"}
     subtype = [
-        {0: "factory"} | {i: f"ota_{i-OTA_MIN}" for i in range(OTA_MIN, OTA_MAX)},
-        {0: "ota", 1: "phy", 2: "nvs", 129: "fat"},  # DATA subtypes
+        {0: "factory"} | {i: f"ota_{i-OTA_MIN}" for i in range(OTA_MIN, OTA_MAX)}, # APP subtypes
+        {0: "ota", 1: "phy", 2: "nvs", 3: "coredump", 4: "nvs_keys", 5: "efuse", 
+         6: "undefined", 129: "fat", 130: "spiffs", 131: "littlefs"}  # DATA subtypes
     ]
     print("Partition table:")
-    print("# Name       Type     SubType      Offset       Size (bytes)")
+    print("# Name       Type     SubType       Offset       Size    (bytes)")
     for p in partition_table():
         print(
-            f"  {p[4]:10s} {ptype[p[0]]:8s} {subtype[p[0]][p[1]]:8} "
+            f"  {p[4]:10s} {ptype[p[0]]:8s} {subtype[p[0]][p[1]] if p[1] in subtype[p[0]] else p[1]:9} "
             + f"{p[2]:#10x} {p[3]:#10x} {p[3]:10,}"
         )
 
